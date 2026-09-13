@@ -11,15 +11,14 @@ mkdir -p /var/run/prosody
 mkdir -p /etc/prosody/certs
 
 # Copy Let's Encrypt certs if available
-LE_PATH="/ssl/letsencrypt/live/${DOMAIN}"
-if [ -f "${LE_PATH}/fullchain.pem" ]; then
-    echo "Copying Let's Encrypt certs..."
-    cp "${LE_PATH}/fullchain.pem" "/etc/prosody/certs/${DOMAIN}.crt"
-    cp "${LE_PATH}/privkey.pem" "/etc/prosody/certs/${DOMAIN}.key"
+if [ -f "/ssl/fullchain.pem" ]; then
+    echo "Copying SSL certs..."
+    cp "/ssl/fullchain.pem" "/etc/prosody/certs/${DOMAIN}.crt"
+    cp "/ssl/privkey.pem" "/etc/prosody/certs/${DOMAIN}.key"
     chmod 640 "/etc/prosody/certs/${DOMAIN}.key"
     SSL_CONFIG="ssl = { key = \"/etc/prosody/certs/${DOMAIN}.key\"; certificate = \"/etc/prosody/certs/${DOMAIN}.crt\"; };"
 else
-    echo "No Let's Encrypt certs found, using self-signed..."
+    echo "No SSL certs found, running without TLS..."
     SSL_CONFIG=""
 fi
 
