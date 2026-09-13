@@ -9,6 +9,8 @@ echo "Starting Prosody for domain: ${DOMAIN}"
 
 mkdir -p /var/run/prosody
 
+CERT_PATH="/data/letsencrypt/live/${DOMAIN}"
+
 cat > /etc/prosody/prosody.cfg.lua <<PROSODY
 admins = { "${ADMIN_USER}@${DOMAIN}" }
 
@@ -23,7 +25,16 @@ allow_registration = false
 daemonize = false
 log = { info = "*stdout" }
 
+https_ssl = {
+    key = "${CERT_PATH}/privkey.pem";
+    certificate = "${CERT_PATH}/fullchain.pem";
+}
+
 VirtualHost "${DOMAIN}"
+    ssl = {
+        key = "${CERT_PATH}/privkey.pem";
+        certificate = "${CERT_PATH}/fullchain.pem";
+    }
 
 Component "conference.${DOMAIN}" "muc"
     modules_enabled = { "muc_mam" }
