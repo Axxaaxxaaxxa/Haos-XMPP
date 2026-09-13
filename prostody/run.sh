@@ -8,8 +8,20 @@ ADMIN_PASSWORD=$(jq --raw-output '.admin_password' /data/options.json)
 echo "Starting Prosody for domain: ${DOMAIN}"
 
 mkdir -p /var/run/prosody
+mkdir -p /etc/prosody/certs
 
-CERT_PATH="/data/letsencrypt/live/${DOMAIN}"
+# Copy Let's Encrypt certs if available
+LE_PATH="/ssl/letsencrypt/live/${DOMAIN}"
+if [ -f "${LE_PATH}/fullchain.pem" ]; then
+    echo "Copying Let's Encrypt certs..."
+    cp "${LE_PATH}/fullchain.pem" "/etc/prosody/certs/${DOMAIN}.crt"
+    cp "${LE_PATH}/privkey.pem" "/etc/prosody/certs/${DOMAIN}.key"
+    chmod 640 "/etc/prosody/certs/${DOMAIN}.key"
+    SSL_CONFIG="ssl = { key = \"/etc/prosody/certs/${DOMAIN}.key\"; certificate = \"/etc/prosody/certs/${DOMAIN}.crt\"; };"
+else
+    echo "No Let's Encrypt certs found, using self-signed..."
+    SSL_CONFIG=""
+fi
 
 cat > /etc/prosody/prosody.cfg.lua <<PROSODY
 admins = { "${ADMIN_USER}@${DOMAIN}" }
@@ -25,16 +37,8 @@ allow_registration = false
 daemonize = false
 log = { info = "*stdout" }
 
-https_ssl = {
-    key = "${CERT_PATH}/privkey.pem";
-    certificate = "${CERT_PATH}/fullchain.pem";
-}
-
 VirtualHost "${DOMAIN}"
-    ssl = {
-        key = "${CERT_PATH}/privkey.pem";
-        certificate = "${CERT_PATH}/fullchain.pem";
-    }
+    ${SSL_CONFIG}
 
 Component "conference.${DOMAIN}" "muc"
     modules_enabled = { "muc_mam" }
