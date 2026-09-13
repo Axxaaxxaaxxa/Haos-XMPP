@@ -1,12 +1,13 @@
-#!/bin/bash
-set -e
+#!/usr/bin/with-contenv bashio
 
 DOMAIN=$(bashio::config 'domain')
 ADMIN_USER=$(bashio::config 'admin_user')
 ADMIN_PASSWORD=$(bashio::config 'admin_password')
 
+bashio::log.info "Starting Prosody XMPP for domain: ${DOMAIN}"
+
 # Generate prosody config
-cat > /etc/prosody/prosody.cfg.lua <<EOF
+cat > /etc/prosody/prosody.cfg.lua <<PROSODY
 admins = { "${ADMIN_USER}@${DOMAIN}" }
 
 modules_enabled = {
@@ -27,7 +28,6 @@ modules_enabled = {
     "ping";
     "register";
     "admin_adhoc";
-    "http_files";
     "mam";
 }
 
@@ -37,16 +37,12 @@ pidfile = "/var/run/prosody/prosody.pid"
 log = { info = "*stdout" }
 
 VirtualHost "${DOMAIN}"
-    ssl = {
-        key = "/var/lib/prosody/${DOMAIN}.key";
-        certificate = "/var/lib/prosody/${DOMAIN}.crt";
-    }
 
 Component "conference.${DOMAIN}" "muc"
     modules_enabled = { "muc_mam" }
-EOF
+PROSODY
 
-# Create admin user if not exists
+# Create admin user
 prosodyctl register "${ADMIN_USER}" "${DOMAIN}" "${ADMIN_PASSWORD}" || true
 
 # Start Prosody
