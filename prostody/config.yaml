@@ -1,6 +1,6 @@
 name: "Prosody XMPP Server"
 description: "Lightweight XMPP server powered by Prosody"
-version: "69.69.70"
+version: "69.420.69"
 slug: "prosody"
 init: false
 arch:
