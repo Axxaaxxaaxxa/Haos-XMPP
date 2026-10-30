@@ -12,10 +12,10 @@ mkdir -p /etc/prosody/certs
 
 echo "Contents of /ssl:"; ls -la /ssl 2>&1 || true
 # Copy Let's Encrypt certs if available
-if [ -f "/ssl/fullchain.pem" ]; then
+if [ -f "/ssl/xmpp_fullchain.pem" ]; then
     echo "Copying SSL certs..."
-    cp "/ssl/fullchain.pem" "/etc/prosody/certs/${DOMAIN}.crt"
-    cp "/ssl/privkey.pem" "/etc/prosody/certs/${DOMAIN}.key"
+    cp "/ssl/xmpp_fullchain.pem" "/etc/prosody/certs/${DOMAIN}.crt"
+    cp "/ssl/xmpp_privkey.pem" "/etc/prosody/certs/${DOMAIN}.key"
     chmod 640 "/etc/prosody/certs/${DOMAIN}.key"
     SSL_CONFIG="ssl = { key = \"/etc/prosody/certs/${DOMAIN}.key\"; certificate = \"/etc/prosody/certs/${DOMAIN}.crt\"; };"
 else
