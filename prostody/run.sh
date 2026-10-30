@@ -10,6 +10,7 @@ echo "Starting Prosody for domain: ${DOMAIN}"
 mkdir -p /var/run/prosody
 mkdir -p /etc/prosody/certs
 
+echo "Contents of /ssl:"; ls -la /ssl 2>&1 || true
 # Copy Let's Encrypt certs if available
 if [ -f "/ssl/fullchain.pem" ]; then
     echo "Copying SSL certs..."
@@ -34,6 +35,7 @@ modules_enabled = {
 
 allow_registration = false
 daemonize = false
+run_as_root = true
 log = { info = "*stdout" }
 
 VirtualHost "${DOMAIN}"
