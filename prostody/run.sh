@@ -34,7 +34,6 @@ modules_enabled = {
 }
 
 allow_registration = false
-daemonize = false
 run_as_root = true
 log = { info = "*stdout" }
 
@@ -47,4 +46,4 @@ PROSODY
 
 prosodyctl register "${ADMIN_USER}" "${DOMAIN}" "${ADMIN_PASSWORD}" 2>/dev/null || true
 
-exec prosody
+exec prosody -F
